@@ -1,0 +1,46 @@
+html,body {
+  font-family: Helvetica;
+}
+#Title {
+  color: Navy;
+
+  font-size: 50px;
+  font-weight: 100;
+  text-align: center;
+
+}
+hr {
+  width: 50%;
+}
+.wrapper {
+  text-align: center;
+  padding: 20px;
+}
+.container {
+  text-align: center;
+}
+#b1 {
+  background:    #ffffff;
+  border:        1px solid #000000;
+  border-radius: 5px;
+  border-color: grey;
+  padding:       8px 20px;
+  color:         #666666;
+  display:       inline-block;
+  font:          normal 700 14px/1 "Helvetica", sans-serif;
+  text-shadow:   1px 1px #ffffff;
+  cursor: pointer;
+
+}
+#b1:hover {
+  border-color: black;
+}
+#button {
+
+}
+#params {
+  
+}
+#players {
+
+}
