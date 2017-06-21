@@ -20,27 +20,37 @@ hr {
 .container {
   text-align: center;
 }
-#b1 {
+.textfield {
+  padding-left: 4.5em;
+  margin-left: 40px;;
+}
+.myButton {
   background:    #ffffff;
   border:        1px solid #000000;
   border-radius: 5px;
   border-color: grey;
   padding:       8px 20px;
-  color:         #666666;
+  color:         #3e3eb2;
   display:       inline-block;
   font:          normal 700 14px/1 "Helvetica", sans-serif;
   text-shadow:   1px 1px #ffffff;
   cursor: pointer;
-
+}
+#b2 {
+  margin-right: 1em;
+}
+#b3 {
+  margin-left: 1em;
 }
 #b1:hover {
   border-color: black;
 }
-#button {
+#nameEntry {
+  display: none;
 
 }
-#params {
-
+#nameForm {
+  padding-left: 1.8em;
 }
 #players {
 
