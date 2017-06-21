@@ -1,3 +1,8 @@
+/*
+* Author: Alan Zeng
+* Basic CSS file
+*/
+
 html,body {
   font-family: Helvetica;
 
@@ -21,8 +26,7 @@ hr {
   text-align: center;
 }
 .textfield {
-  padding-left: 4.5em;
-  margin-left: 40px;;
+  margin-left: 40px;
 }
 .myButton {
   background:    #ffffff;
@@ -36,14 +40,26 @@ hr {
   text-shadow:   1px 1px #ffffff;
   cursor: pointer;
 }
-#b2 {
-  margin-right: 1em;
+.help {
+  cursor: pointer;
+  font-size: 2em;
 }
-#b3 {
+#onlineButton {
+  margin-right: 1em;
+  margin-left: 2.1em;
+}
+#papButton {
   margin-left: 1em;
 }
-#b1:hover {
+#ngButton:hover {
   border-color: black;
+
+}
+#ngButton {
+  margin-right: .6em;
+}
+#jgButton {
+  margin-left: .6em;
 }
 #nameEntry {
   display: none;
@@ -51,6 +67,15 @@ hr {
 }
 #nameForm {
   padding-left: 1.8em;
+}
+
+#helpDiv {
+  display: none;
+}
+#helpText {
+  position: relative;
+  margin-top: -1.8em;
+  margin-bottom: -0.5em;
 }
 #players {
 
