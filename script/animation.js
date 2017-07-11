@@ -8,6 +8,8 @@
 var time = null;
 var newTime = null;
 var numPlayers = null;
+var morgana = null;
+var oberon = null;
 var playerArr = [];
 
 //Helper methods
@@ -88,13 +90,13 @@ var main = function() {
   //Second page, Game mode selection pt.2
   $(document).on('click', '#papButton', function() {
     var params = "<div id = 'params' class=container>" +
-"<label for='select'>Number of Players:</label><select id = 'players' value = 'select'><option value = 'x'> --Select Number-- </option><option value = '5'> 5 </option><option value = '6'> 6 </option><option value = '7'> 7 </option><option value = '8'> 8 </option><option value = '9'> 9 </option><option value = '10'> 10 </option></select>" +
-"<br><br><label for = 'time'> Set the time limit for each round: </label><select id = 'time' value = 'time'><option value = 'xx'> --Select Time-- </option><option value = 'NL'> No Limit </option><option value = '60'> 1:00 </option><option value = '90'> 1:30 </option><option value = '120'> 2:00 </option><option value = '150'> 2:30 </option><option value = '180'> 3:00 </option><option value = '210'> 3:30 </option><option value = '240'> 4:00 </option><option value = '270'> 4:30 </option>  <option value = '300'> 5:00 </option><option value = '330'> 5:30 </option><option value = '360'> 6:00 </option><option value = '390'> 6:30 </option></select><br><br><button id='nextButton' class = myButton>Next</button></div>";
+"<label for='select'>Number of Players:</label><select id = 'players' value = 'select'><option value = 'x'> --Select Number-- </option><option value = '7'> 7 </option><option value = '8'> 8 </option><option value = '9'> 9 </option><option value = '10'> 10 </option></select>" +
+"<br><br><label for = 'time'> Set the time limit for each round: </label><select id = 'time' value = 'time'><option value = 'xx'> --Select Time-- </option><option value = 'NL'> No Limit </option><option value = '60'> 1:00 </option><option value = '90'> 1:30 </option><option value = '120'> 2:00 </option><option value = '150'> 2:30 </option><option value = '180'> 3:00 </option><option value = '210'> 3:30 </option><option value = '240'> 4:00 </option><option value = '270'> 4:30 </option>  <option value = '300'> 5:00 </option><option value = '330'> 5:30 </option><option value = '360'> 6:00 </option><option value = '390'> 6:30 </option></select><br><br><label>Enable Morgana Role</label><input type='checkbox' id = morgana class = roleCheckbox><br><br><label>Enable Oberon Role</label><input type='checkbox' id = oberon class = roleCheckbox><br><br><button id='nextButton' class = myButton>Next</button></div>";
 
     $("#secondButtons").fadeOut("slow", function () {
-    var div =$(params).hide();
-    $(this).replaceWith(div);
-    $("#params").fadeIn(550);
+      var div =$(params).hide();
+      $(this).replaceWith(div);
+      $("#params").fadeIn(550);
     });
 
   });
@@ -109,6 +111,8 @@ var main = function() {
     //Scan vals
     time = getSelectedText("time");
     numPlayers = getSelectedText("players");
+    morgana = $("#morgana:checked").val();
+    oberon = $("#oberon:checked").val();
 
     //Check validity
     if(time[0] === '-' || players[0] === '-') {
@@ -141,19 +145,7 @@ var main = function() {
     }
 
   });
-  //End of name entry, start pass and play game
-  $(document).on('click', '#sgButton',function() {
-    createPlayerArray();
-    var valid = isPlayerArrayValid();
-    if(!valid) {
-      alert("Please fill out fields for all players.");
-    }
-    else {
-      //BEGIN GAME
-    console.log("GAME STARTO");
-    console.log(playerArr.toString());
-    }
-  });
+
 
 
 

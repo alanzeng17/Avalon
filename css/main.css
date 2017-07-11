@@ -44,6 +44,18 @@ hr {
   cursor: pointer;
   font-size: 2em;
 }
+.messagecheckbox {
+  padding-left: .5em;
+
+
+}
+.resistance {
+  color: red;
+  font-weight: bold;
+}
+.spy {
+  font-weight: bold;
+}
 #onlineButton {
   margin-right: 1em;
   margin-left: 2.1em;
@@ -77,6 +89,6 @@ hr {
   margin-top: -1.8em;
   margin-bottom: -0.5em;
 }
-#players {
-
+#statement {
+  display: none;
 }
