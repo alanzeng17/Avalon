@@ -8,7 +8,7 @@ html,body {
 
 }
 #Title {
-  color: Navy;
+  color: #000080;
 
   font-size: 50px;
   font-weight: 100;
@@ -91,4 +91,8 @@ hr {
 }
 #statement {
   display: none;
+}
+#missionPic {
+  width: 100px;
+  height: 150px;
 }

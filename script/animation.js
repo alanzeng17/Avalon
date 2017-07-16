@@ -45,14 +45,7 @@ function createPlayerArray() {
   }
 
 }
-function isPlayerArrayValid() {
-  for(var i = 0; i < numPlayers; i++) {
-    if(playerArr[i].value ==='') {
-      return false;
-    }
-  }
-  return true;
-}
+
 
 /*
 * Main start screen runner
@@ -113,6 +106,7 @@ var main = function() {
     numPlayers = getSelectedText("players");
     morgana = $("#morgana:checked").val();
     oberon = $("#oberon:checked").val();
+
 
     //Check validity
     if(time[0] === '-' || players[0] === '-') {
