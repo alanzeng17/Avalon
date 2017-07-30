@@ -5,6 +5,7 @@
 */
 
 //Global Variables
+//as of now, time is not used
 var time = null;
 var newTime = null;
 var numPlayers = null;
@@ -13,6 +14,16 @@ var oberon = null;
 var playerArr = [];
 
 //Helper methods
+
+/**
+* Method to transition HTML code dynamically
+*/
+function transition(fromId, newDiv, toId) {
+  $(fromId).fadeOut("slow", function () {
+  $(fromId).replaceWith(newDiv);
+  $(toId).fadeIn(550);
+  });
+}
 /*
 * Method to return the text of a given element id
 */
@@ -26,6 +37,7 @@ function getSelectedText(elementId) {
 }
 /*
 * Converts the time in x:x0 format to seconds
+* Currently unused.
 */
 function timeConversion() {
   if(time[0] === 'N') {
@@ -59,13 +71,16 @@ var main = function() {
       var sButtons = "<div id= secondButtons class = wrapper><input class='myButton' type='button' id='onlineButton' value='Play Online'><input class='myButton' type='button' id='papButton' value='Pass and Play'></div>";
 
       //animation to go to second part(name entry/game select)
-      $("#button").fadeOut("slow", function () {
+      /*$("#button").fadeOut("slow", function () {
       var div =$(sButtons).hide();
       $("#button").replaceWith(div);
-      $("#secondButtons").fadeIn(550);
+      $("#secondButtons").fadeIn(550);});*/
+
+      var div =$(sButtons).hide();
+      transition("#button",div,"#secondButtons");
 
       //!add a back button animation!
-      });
+
       $("#helpDiv").replaceWith("<div id='helpDiv' class='wrapper'><p id= 'helpText'>Pass and Play: Play with your friends using one device.<br>Play Online: Join an existing lobby</p></div>");
 
   });
@@ -84,13 +99,17 @@ var main = function() {
   $(document).on('click', '#papButton', function() {
     var params = "<div id = 'params' class=container>" +
 "<label for='select'>Number of Players:</label><select id = 'players' value = 'select'><option value = 'x'> --Select Number-- </option><option value = '7'> 7 </option><option value = '8'> 8 </option><option value = '9'> 9 </option><option value = '10'> 10 </option></select>" +
-"<br><br><label for = 'time'> Set the time limit for each round: </label><select id = 'time' value = 'time'><option value = 'xx'> --Select Time-- </option><option value = 'NL'> No Limit </option><option value = '60'> 1:00 </option><option value = '90'> 1:30 </option><option value = '120'> 2:00 </option><option value = '150'> 2:30 </option><option value = '180'> 3:00 </option><option value = '210'> 3:30 </option><option value = '240'> 4:00 </option><option value = '270'> 4:30 </option>  <option value = '300'> 5:00 </option><option value = '330'> 5:30 </option><option value = '360'> 6:00 </option><option value = '390'> 6:30 </option></select><br><br><label>Enable Morgana Role</label><input type='checkbox' id = morgana class = roleCheckbox><br><br><label>Enable Oberon Role</label><input type='checkbox' id = oberon class = roleCheckbox><br><br><button id='nextButton' class = myButton>Next</button></div>";
+"<br><br><label>Enable Morgana Role</label><input type='checkbox' id = morgana class = roleCheckbox><br><br><label>Enable Oberon Role</label><input type='checkbox' id = oberon class = roleCheckbox><br><br><button id='nextButton' class = myButton>Next</button></div>";
 
-    $("#secondButtons").fadeOut("slow", function () {
+//<label for = 'time'> Set the time limit for each round: </label><select id = 'time' value = 'time'><option value = 'xx'> --Select Time-- </option><option value = 'NL'> No Limit </option><option value = '60'> 1:00 </option><option value = '90'> 1:30 </option><option value = '120'> 2:00 </option><option value = '150'> 2:30 </option><option value = '180'> 3:00 </option><option value = '210'> 3:30 </option><option value = '240'> 4:00 </option><option value = '270'> 4:30 </option>  <option value = '300'> 5:00 </option><option value = '330'> 5:30 </option><option value = '360'> 6:00 </option><option value = '390'> 6:30 </option></select>
+
+    /*$("#secondButtons").fadeOut("slow", function () {
       var div =$(params).hide();
-      $(this).replaceWith(div);
+      $("#secondButtons").replaceWith(div);
       $("#params").fadeIn(550);
-    });
+    });*/
+    var div =$(params).hide();
+    transition("#secondButtons",div,"#params");
 
   });
   $(document).on('click', '#onlineButton', function() {
@@ -102,18 +121,18 @@ var main = function() {
   //Third Page, settings selection
   $(document).on('click', "#nextButton", function() {
     //Scan vals
-    time = getSelectedText("time");
+    //time = getSelectedText("time");
     numPlayers = getSelectedText("players");
     morgana = $("#morgana:checked").val();
     oberon = $("#oberon:checked").val();
 
 
     //Check validity
-    if(time[0] === '-' || players[0] === '-') {
-      alert("Please fill in the Number of Players and Time Limit.");
+    if(players[0] === '-') {
+      alert("Please fill in the Number of Players");
     }
     else {
-      timeConversion();
+      //timeConversion();
 
       //Help change
       $("#helpDiv").replaceWith("<div id='helpDiv' class='wrapper'><p id= 'helpText'>Enter the players' names in order of position.</p></div>");
@@ -128,11 +147,13 @@ var main = function() {
       fields = fields.concat("</form><button id = 'sgButton' class = 'myButton'>Start Game</button></div>");
 
       //animation to go to second part(name entry/game select)
-      $("#params").fadeOut("slow", function () {
+     /*$("#params").fadeOut("slow", function () {
       var div =$(fields);
       $(this).replaceWith(div);
       $("#nameEntry").fadeIn(550);
-      });
+    });*/
+      var div =$(fields);
+      transition("#params",div,"#nameEntry");
 
 
 

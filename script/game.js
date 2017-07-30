@@ -194,11 +194,14 @@ var main = function() {
 
 
       //Transition to start play by play
-      $("#nameEntry").fadeOut("slow", function () {
+      /*$("#nameEntry").fadeOut("slow", function () {
       var div =$(blank);
       $(this).replaceWith(div);
       $("#blank").fadeIn(550);
-      });
+    });*/
+
+      var div =$(blank);
+      transition("#nameEntry",div,"#blank");
 
 
     }
@@ -208,7 +211,14 @@ var main = function() {
   $(document).on('click', '#spapButton', function() {
 
     var currentRole = roleArray[papCounter];
+    var tempCounter = 0;
     var roleStatement = "<div id='all' class='wrapper'>"+playerArr[papCounter]+"<br><br><div id='statement' class='wrapper'>";
+
+    if(tempCounter === 0) {
+      var cap = getSelectedText("cap");
+      captainIndex = roleArray.indexOf(cap);
+      papCounter = captainIndex;
+    }
 
     shuffleArray(spyArray);
     switch(currentRole) {
@@ -278,37 +288,43 @@ var main = function() {
 
     }
     roleStatement = roleStatement.concat("</div><div id='buttonStatment' class = 'wrapper'><button id='toggle' class='myButton'>Show/Hide role</button><br><br>");
-    if(papCounter < numPlayers-1) {
+    if(tempCounter < numPlayers-1) {
+      if(papCounter === numPlayers) {
+        papCounter = 0;
+      }
       roleStatement = roleStatement.concat("<button id='spapButton' class='myButton'>Move to next player</button></div></div>");
     }
     else {
       roleStatement = roleStatement.concat("<button id='beginGame' class='myButton'>Start Game</button></div></div>");
     }
     $('#statement').replaceWith("<div></div>");
-    if(papCounter === 0) {
-      var cap = getSelectedText("cap");
-      captainIndex = roleArray.indexOf(cap)
-      $("#blank").fadeOut("slow", function () {
+    var div =$(roleStatement);
+    if(tempCounter === 0) {
+      /*$("#blank").fadeOut("slow", function () {
       var div =$(roleStatement);
       $(this).replaceWith(div);
       $("#all").fadeIn(550);
-      });
+    });*/
+      transition("#blank",div,"#all");
     } else {
-      $("#all").fadeOut("slow", function () {
+      /*$("#all").fadeOut("slow", function () {
       var div =$(roleStatement);
       $(this).replaceWith(div);
       $("#all").fadeIn(550);
-      });
+    });*/
+      transition("#all",div,"#all");
 
     }
     papCounter++;
+    tempCounter++;
   });
-
+  //toggle show/hide of role
   $(document).on('click','#buttonStatment',function() {
     $('#statement').fadeToggle(300);
-    console.log('toggle goggle');
   });
+  //Game Main Menu
   $(document).on('click','#beginGame',function() {
+    $('#statement').replaceWith("<div></div>");
     gameTemplate = "<div id='game' class='wrapper'>";
     switch(roundCounter) {
       case '1':
@@ -327,29 +343,37 @@ var main = function() {
         teamCount = 4;
         break;
     }
+    //Determine which mission images to display
     if(numPlayers === '7') {
-      gameTemplate = "<div id='image class='wrapper'><img src='missions/7m1.png' class='missionPic' id='m1'><img src='missions/7m2.png' class='missionPic' id='m2'><img src='missions/7m3.png' class='missionPic' id='m3'><img src='missions/7m4.png' class='missionPic' id='m4'><img src='missions/7m5.png' class='missionPic' id='m5'> </div>";
+      gameTemplate = "<div id='image' class='wrapper'><img src='missions/7m1.png' class='missionPic' id='m1'><img src='missions/7m2.png' class='missionPic' id='m2'><img src='missions/7m3.png' class='missionPic' id='m3'><img src='missions/7m4.png' class='missionPic' id='m4'><img src='missions/7m5.png' class='missionPic' id='m5'> </div>";
 
     } else {
-      gameTemplate = "<div id='image class='wrapper'><img src='missions/8m1.png' class='missionPic' id='m1'> </div>";
+      gameTemplate = "<div id='image' class='wrapper'><img src='missions/8m1.png' class='missionPic' id='m1'> </div>";
       teamCount++;
     }
-
-    var teamForm = "<label for='team'>";
-    for(var i = 0;i<teamCount; i++) {
-      teamForm = teamForm.concat("<select id='team' value = 'member"+i+"'>");
+    //Creates the forms to set up the team
+    var teamForm = "<div id ='teamForm' class='wrapper'>";
+    for(var formIndex = 1; formIndex < teamCount; formIndex++) {
+      teamForm = teamForm.concat("<label for='team"+formIndex+"'><select id = 'member"+i+"' value='team"+formIndex+"'>");
+      for(var i = 0;i<playerArr.length; i++) {
+        teamForm = teamForm.concat("<option value = "+ i +"> "+ playerArr[i] +"</option>");
+      }
+      teamForm = teamForm.concat("</label></select>");
     }
-    teamForm = teamForm.concat("</label>");
+    teamForm = teamForm.concat("</div>")
 
-    gameTemplate = gameTemplate.concat("<button class='myButton' id ='voting'>Move to voting</button></div>");
-    $("#all").fadeOut("slow", function () {
+    //Move to voting button
+    gameTemplate = gameTemplate.concat(teamForm);
+    gameTemplate = gameTemplate.concat("<div id='votingButton' class='wrapper'><button class='myButton' id ='voting'>Move to voting</button></div></div>");
+    /*$("#all").fadeOut("slow", function () {
     var div =$(gameTemplate);
     $(this).replaceWith(div);
     $("#game").fadeIn(800);
-    });
+  });*/
+    transition("#all",div,"#game");
   });
-  $(document).on('click','#nextRound',function() {
-    //start timer
+  $(document).on('click','#voting',function() {
+
 
   });
 
