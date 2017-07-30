@@ -1,3 +1,6 @@
+//cd Documents/Alan/Personal/Avalon
+// for easy github
+
 //temp array to get set random indexes for each role
 var tempArray = null;
 //Array that maps each role to a player by matching indexes
@@ -12,6 +15,7 @@ var mordred = null;
 
 //index of the captain
 var captainIndex = null;
+var captainName = null;
 
 var numSpies = 3;
 var numResistance = 4;
@@ -149,7 +153,7 @@ function setIndexes() {
 }
 function isPlayerArrayValid() {
   for(var i = 0; i < numPlayers; i++) {
-    if(playerArr[i].value ==='') {
+    if(playerArr[i] ==='') {
       return false;
     }
   }
@@ -170,13 +174,16 @@ function checkArrayForDupes(arr) {
 var main = function() {
   //End of name entry, start pass and play game
   $(document).on('click', '#sgButton',function() {
+    console.log(playerArr.toString());
     createPlayerArray();
     var valid = isPlayerArrayValid();
     var dupes = checkArrayForDupes(playerArr);
     if(!valid) {
       alert("Please fill out fields for all players.");
+      playerArr = [];
     } else if(!dupes) {
       alert("Please remove any duplicate names!");
+      playerArr = [];
     }
     else {
       setTeams();
@@ -211,14 +218,7 @@ var main = function() {
   $(document).on('click', '#spapButton', function() {
 
     var currentRole = roleArray[papCounter];
-    var tempCounter = 0;
     var roleStatement = "<div id='all' class='wrapper'>"+playerArr[papCounter]+"<br><br><div id='statement' class='wrapper'>";
-
-    if(tempCounter === 0) {
-      var cap = getSelectedText("cap");
-      captainIndex = roleArray.indexOf(cap);
-      papCounter = captainIndex;
-    }
 
     shuffleArray(spyArray);
     switch(currentRole) {
@@ -288,23 +288,23 @@ var main = function() {
 
     }
     roleStatement = roleStatement.concat("</div><div id='buttonStatment' class = 'wrapper'><button id='toggle' class='myButton'>Show/Hide role</button><br><br>");
-    if(tempCounter < numPlayers-1) {
-      if(papCounter === numPlayers) {
-        papCounter = 0;
-      }
+    if(papCounter < numPlayers-1) {
       roleStatement = roleStatement.concat("<button id='spapButton' class='myButton'>Move to next player</button></div></div>");
     }
     else {
-      roleStatement = roleStatement.concat("<button id='beginGame' class='myButton'>Start Game</button></div></div>");
+      roleStatement = roleStatement.concat("<button id='beginGame' class='myButton'>Start Game</button><button id='restartNight' class='myButton'>Restart Night</button></div></div>");
     }
     $('#statement').replaceWith("<div></div>");
     var div =$(roleStatement);
-    if(tempCounter === 0) {
+    if(papCounter === 0) {
       /*$("#blank").fadeOut("slow", function () {
       var div =$(roleStatement);
       $(this).replaceWith(div);
       $("#all").fadeIn(550);
     });*/
+      captainName = $("#cap option:selected").text();
+      captainIndex = $("#cap").val();
+      console.log(captainName + ": " + captainIndex);
       transition("#blank",div,"#all");
     } else {
       /*$("#all").fadeOut("slow", function () {
@@ -316,7 +316,13 @@ var main = function() {
 
     }
     papCounter++;
-    tempCounter++;
+  });
+  $(document).on('click','#restartNight',function() {
+    papCounter = 0;
+    $('#statement').replaceWith("<div></div>");
+    var div = $("<div id='blank' class='wrapper'><button id='spapButton' class='myButton'>Restart Night</button><button id='beginGame' class='myButton'>Cancel</button></div>");
+    transition("#all",div,"#blank");
+
   });
   //toggle show/hide of role
   $(document).on('click','#buttonStatment',function() {
@@ -325,40 +331,48 @@ var main = function() {
   //Game Main Menu
   $(document).on('click','#beginGame',function() {
     $('#statement').replaceWith("<div></div>");
+    console.log("Round Counter: " + roundCounter);
     gameTemplate = "<div id='game' class='wrapper'>";
     switch(roundCounter) {
-      case '1':
+      case 1:
         teamCount = 2;
         break;
-      case '2':
+      case 2:
         teamCount = 3;
         break;
-      case '3':
+      case 3:
         teamCount = 3;
         break;
-      case '4':
+      case 4:
         teamCount = 4;
         break;
-      case '5':
+      case 5:
         teamCount = 4;
+        break;
+      default:
+        console.log("fail");
         break;
     }
     //Determine which mission images to display
+    var imgTemplate;
     if(numPlayers === '7') {
-      gameTemplate = "<div id='image' class='wrapper'><img src='missions/7m1.png' class='missionPic' id='m1'><img src='missions/7m2.png' class='missionPic' id='m2'><img src='missions/7m3.png' class='missionPic' id='m3'><img src='missions/7m4.png' class='missionPic' id='m4'><img src='missions/7m5.png' class='missionPic' id='m5'> </div>";
+      imgTemplate = "<div id='image' class='wrapper'><img src='missions/7m1.png' class='missionPic' id='m1'><img src='missions/7m2.png' class='missionPic' id='m2'><img src='missions/7m3.png' class='missionPic' id='m3'><img src='missions/7m4.png' class='missionPic' id='m4'><img src='missions/7m5.png' class='missionPic' id='m5'> </div>";
 
     } else {
-      gameTemplate = "<div id='image' class='wrapper'><img src='missions/8m1.png' class='missionPic' id='m1'> </div>";
+      imgTemplate = "<div id='image' class='wrapper'><img src='missions/8m1.png' class='missionPic' id='m1'> </div>";
       teamCount++;
     }
+    gameTemplate = gameTemplate.concat(imgTemplate);
+    gameTemplate = gameTemplate.concat("<div id='dispCap' class='wrapper'>The Captain is: <strong>"+captainName+"</strong></div>");
     //Creates the forms to set up the team
     var teamForm = "<div id ='teamForm' class='wrapper'>";
-    for(var formIndex = 1; formIndex < teamCount; formIndex++) {
-      teamForm = teamForm.concat("<label for='team"+formIndex+"'><select id = 'member"+i+"' value='team"+formIndex+"'>");
+    for(var formIndex = 0; formIndex < teamCount; formIndex++) {
+      console.log("yo");
+      teamForm = teamForm.concat("<label for='team"+formIndex+"'>Team Member "+(formIndex+1)+":</label><select id = 'member"+i+"' value='team"+formIndex+"'>");
       for(var i = 0;i<playerArr.length; i++) {
         teamForm = teamForm.concat("<option value = "+ i +"> "+ playerArr[i] +"</option>");
       }
-      teamForm = teamForm.concat("</label></select>");
+      teamForm = teamForm.concat("</select><br><br>");
     }
     teamForm = teamForm.concat("</div>")
 
@@ -370,9 +384,14 @@ var main = function() {
     $(this).replaceWith(div);
     $("#game").fadeIn(800);
   });*/
+    console.log(teamForm);
+    var div =$(gameTemplate);
     transition("#all",div,"#game");
+
   });
   $(document).on('click','#voting',function() {
+    //check to see if team members are dupes
+    //if not move on
 
 
   });

@@ -39,6 +39,8 @@ hr {
   font:          normal 700 14px/1 "Helvetica", sans-serif;
   text-shadow:   1px 1px #ffffff;
   cursor: pointer;
+  margin-right: 1em;
+  margin-left: 2.1em;
 }
 .help {
   cursor: pointer;
