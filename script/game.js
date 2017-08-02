@@ -27,6 +27,11 @@ var teamCount = 0;
 
 var gameTemplate = null;
 
+//temp used to hold the previous div in the cancel case
+var cancelTemp = null;
+//temp used to hold the team for each round
+var teamTemp = null;
+
 /*
   Fischer-yates shuffle algorithm
   Randomly shuffles an array
@@ -170,7 +175,15 @@ function checkArrayForDupes(arr) {
   return true;
 
 }
-
+function isTeamValid(arr) {
+  teamTemp = null;
+  teamTemp.push(captainName);
+  for(var i = 0; i < teamCount; i++) {
+    var mem = $('#member'+i' option:selected').text();
+    teamTemp.push(mem);
+  }
+  return checkArrayForDupes(teamTemp);
+}
 var main = function() {
   //End of name entry, start pass and play game
   $(document).on('click', '#sgButton',function() {
@@ -296,6 +309,7 @@ var main = function() {
     }
     $('#statement').replaceWith("<div></div>");
     var div =$(roleStatement);
+    temp = div;
     if(papCounter === 0) {
       /*$("#blank").fadeOut("slow", function () {
       var div =$(roleStatement);
@@ -318,10 +332,19 @@ var main = function() {
     papCounter++;
   });
   $(document).on('click','#restartNight',function() {
+    //completly restart night mode
     papCounter = 0;
     $('#statement').replaceWith("<div></div>");
-    var div = $("<div id='blank' class='wrapper'><button id='spapButton' class='myButton'>Restart Night</button><button id='beginGame' class='myButton'>Cancel</button></div>");
+    var div = $("<div id='blank' class='wrapper'><button id='spapButton' class='myButton'>Restart Night</button><button id='cancelR' class='myButton'>Cancel</button></div>");
     transition("#all",div,"#blank");
+
+  });
+  //cancel is clicked
+  $(document).on('click','#cancelR',function() {
+    //reset vals and div to previous screen
+    papCounter = numPlayers-1;
+    var div = cancelTemp;
+    transition("#blank",div,"#all");
 
   });
   //toggle show/hide of role
@@ -392,6 +415,11 @@ var main = function() {
   $(document).on('click','#voting',function() {
     //check to see if team members are dupes
     //if not move on
+    if(!isPlayerArrayValid()) {
+      alert("Please pick a team with unique members!");
+    } else {
+
+    }
 
 
   });

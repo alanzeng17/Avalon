@@ -120,15 +120,16 @@ var main = function() {
 
   //Third Page, settings selection
   $(document).on('click', "#nextButton", function() {
+
+
     //Scan vals
     //time = getSelectedText("time");
     numPlayers = getSelectedText("players");
     morgana = $("#morgana:checked").val();
     oberon = $("#oberon:checked").val();
 
-
     //Check validity
-    if(players[0] === '-') {
+    if(numPlayers[0] === '-') {
       alert("Please fill in the Number of Players");
     }
     else {
