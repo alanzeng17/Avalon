@@ -1,6 +1,8 @@
 //cd Documents/Alan/Personal/Avalon
 // for easy github
 
+//To-do list: Fix img transitions,Add round counter to game screen, Increment captain(account for OOB error),do pregame calculations(check win condition),merlin guess,implement 8+players
+
 //temp array to get set random indexes for each role
 var tempArray = null;
 //Array that maps each role to a player by matching indexes
@@ -26,11 +28,22 @@ var roundCounter = 1;
 var teamCount = 0;
 
 var gameTemplate = null;
-
+//holds each mission's result in each corresponding index
+var missionResultArray = ["","","","",""];
 //temp used to hold the previous div in the cancel case
 var cancelTemp = null;
 //temp used to hold the team for each round
 var teamTemp = null;
+//temp used to count the number of votes
+var voteCount = 0;
+//temp used to hold the current vote
+var voteTemp = "";
+//used to hold the votes
+var voteArray = null;
+var resistanceWins = 0;
+var spyWins = 0;
+
+var voteFlag = false;
 
 /*
   Fischer-yates shuffle algorithm
@@ -176,12 +189,12 @@ function checkArrayForDupes(arr) {
 
 }
 function isTeamValid(arr) {
-  teamTemp = null;
-  teamTemp.push(captainName);
+  teamTemp = [];
   for(var i = 0; i < teamCount; i++) {
-    var mem = $('#member'+i' option:selected').text();
+    var mem = $('#member'+i+' option:selected').text();
     teamTemp.push(mem);
   }
+  console.log(teamTemp.toString());
   return checkArrayForDupes(teamTemp);
 }
 var main = function() {
@@ -318,7 +331,7 @@ var main = function() {
     });*/
       captainName = $("#cap option:selected").text();
       captainIndex = $("#cap").val();
-      console.log(captainName + ": " + captainIndex);
+      console.log("Captain: "+ captainName + ": " + captainIndex);
       transition("#blank",div,"#all");
     } else {
       /*$("#all").fadeOut("slow", function () {
@@ -377,21 +390,45 @@ var main = function() {
         break;
     }
     //Determine which mission images to display
-    var imgTemplate;
-    if(numPlayers === '7') {
-      imgTemplate = "<div id='image' class='wrapper'><img src='missions/7m1.png' class='missionPic' id='m1'><img src='missions/7m2.png' class='missionPic' id='m2'><img src='missions/7m3.png' class='missionPic' id='m3'><img src='missions/7m4.png' class='missionPic' id='m4'><img src='missions/7m5.png' class='missionPic' id='m5'> </div>";
-
+    var imgTemplate = "<div id='image' class='wrapper'>";
+    if(numPlayers == 7) {
+      for(var i = 0; i < 5; i++) {
+        switch(missionResultArray[i]) {
+          case "Pass":
+            imgTemplate = imgTemplate.concat("<img src='missions/7m"+(i+1)+"r.png' class='missionPic' id='m"+(i+1)+"'>");
+            break;
+          case "Fail":
+            imgTemplate = imgTemplate.concat("<img src='missions/7m"+(i+1)+"s.png' class='missionPic' id='m"+(i+1)+"'>");
+            break;
+          default:
+            imgTemplate = imgTemplate.concat("<img src='missions/7m"+(i+1)+".png' class='missionPic' id='m"+(i+1)+"'>");
+            break;
+        }
+      }
     } else {
-      imgTemplate = "<div id='image' class='wrapper'><img src='missions/8m1.png' class='missionPic' id='m1'> </div>";
-      teamCount++;
+      for(var i = 0; i < 5; i++) {
+        switch(missionResultArray[i]) {
+          case "Pass":
+            imgTemplate = imgTemplate.concat("<img src='missions/8m"+(i+1)+"r.png' class='missionPic' id='m"+(i+1)+"'>");
+            break;
+          case "Fail":
+            imgTemplate = imgTemplate.concat("<img src='missions/8m"+(i+1)+"s.png' class='missionPic' id='m"+(i+1)+"'>");
+            break;
+          default:
+            imgTemplate = imgTemplate.concat("<img src='missions/8m"+(i+1)+".png' class='missionPic' id='m"+(i+1)+"'>");
+            break;
+        }
+
+      }
     }
+    imgTemplate = imgTemplate.concat("</div>");
+
     gameTemplate = gameTemplate.concat(imgTemplate);
     gameTemplate = gameTemplate.concat("<div id='dispCap' class='wrapper'>The Captain is: <strong>"+captainName+"</strong></div>");
     //Creates the forms to set up the team
     var teamForm = "<div id ='teamForm' class='wrapper'>";
     for(var formIndex = 0; formIndex < teamCount; formIndex++) {
-      console.log("yo");
-      teamForm = teamForm.concat("<label for='team"+formIndex+"'>Team Member "+(formIndex+1)+":</label><select id = 'member"+i+"' value='team"+formIndex+"'>");
+      teamForm = teamForm.concat("<label for='team"+formIndex+"'>Team Member "+(formIndex+1)+":</label><select id = 'member"+formIndex+"' value='team"+formIndex+"'>");
       for(var i = 0;i<playerArr.length; i++) {
         teamForm = teamForm.concat("<option value = "+ i +"> "+ playerArr[i] +"</option>");
       }
@@ -401,27 +438,97 @@ var main = function() {
 
     //Move to voting button
     gameTemplate = gameTemplate.concat(teamForm);
-    gameTemplate = gameTemplate.concat("<div id='votingButton' class='wrapper'><button class='myButton' id ='voting'>Move to voting</button></div></div>");
-    /*$("#all").fadeOut("slow", function () {
+    gameTemplate = gameTemplate.concat("<div id='votingButton' class='wrapper'><button class='myButton' id ='voteSet'>Move to voting</button></div></div>");
+
     var div =$(gameTemplate);
-    $(this).replaceWith(div);
-    $("#game").fadeIn(800);
-  });*/
-    console.log(teamForm);
-    var div =$(gameTemplate);
-    transition("#all",div,"#game");
+
+    if(voteFlag) {
+      transition("#results",div,"#game");
+    } else {
+      transition("#all",div,"#game");
+    }
+    roundCounter++;
 
   });
-  $(document).on('click','#voting',function() {
+  $(document).on('click','#voteSet',function() {
     //check to see if team members are dupes
     //if not move on
-    if(!isPlayerArrayValid()) {
+    if(!isTeamValid()) {
       alert("Please pick a team with unique members!");
     } else {
-
+      voteArray = [];
+      var voteSetup = "<div id='voteSetup' class='wrapper'>Pass to <strong>"+captainName+"</strong> to begin voting.<br><br><button id='vote' class='myButton'>Begin Voting</button></div>";
+      var div = $(voteSetup);
+      transition("#game",div,"#voteSetup");
     }
 
 
+  });
+  $(document).on('click','#vote', function() {
+    if(voteCount == teamCount) {
+      voteTemp = $('#vote option:selected').text();
+      voteArray.push(voteTemp);
+      var voteReveal = "<div id='results' class='wrapper'>";
+      var passCount = 0;
+      var failCount = 0;
+      var color = "red";
+      //reset the vote count
+      voteCount = 0;
+      var result = "";
+      //tally the pass/fail
+      for(var i = 0; i < voteArray.length; i++) {
+        if(voteArray[i] === 'Pass') {
+          passCount++;
+        } else {
+          failCount++;
+        }
+      }
+      //Determine if mission fails or not
+      if(roundCounter === 4) {
+        if(failCount >= 2) {
+          result = 'Fail';
+        } else {
+          result = 'Pass';
+        }
+      } else {
+        if(failCount >= 1) {
+          result = 'Fail';
+        } else {
+          result = 'Pass';
+        }
+      }
+      if(result === 'Fail') {
+        spyWins++;
+        color = black;
+      } else {
+        resistanceWins++;
+      }
+      missionResultArray[roundCounter-2] = result;
+      voteReveal = voteReveal.concat("With "+passCount+" votes to pass the mission and "+failCount+" votes to fail the mission, the mission result is:<br><div style='color:"+color+"' class='wrapper'><strong>"+result+"</strong></div><br><button id='beginGame' class='myButton'>Continue</button></div>");
+      console.log("Current missions: " + missionResultArray.toString());
+
+      var div = $(voteReveal);
+      voteFlag = true;
+      transition("#voteForm",div,"#results");
+    } else {
+      if(voteCount != 0) {
+        voteTemp = $('#vote option:selected').text();
+        voteArray.push(voteTemp);
+        console.log("Vote array is: " + voteArray.toString());
+      }
+      console.log("Vote Count is: " + voteCount);
+      var voting = "<div id='voteForm' class='wrapper'><label for ='vote'><strong>"+teamTemp[voteCount]+"</strong><br><br> Choose your vote for the mission.  :</label><select id='vote' value='vote'><option value='Pass'>Pass</option><option value = 'Fail'>Fail</option></select><br><br><button id ='vote' class='myButton'>Submit</button></div>";
+
+      var div = $(voting);
+      if(voteCount == 0) {
+        voteCount++;
+        transition("#voteSetup",div,"#voteForm");
+      } else {
+        voteCount++;
+        transition("#voteForm",div,"#voteForm");
+      }
+
+    }
   });
 
 

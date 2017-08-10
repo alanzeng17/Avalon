@@ -19,9 +19,9 @@ var playerArr = [];
 * Method to transition HTML code dynamically
 */
 function transition(fromId, newDiv, toId) {
-  $(fromId).fadeOut("slow", function () {
+  $(fromId).fadeOut(1, function () {
   $(fromId).replaceWith(newDiv);
-  $(toId).fadeIn(550);
+  $(toId).fadeIn(1);
   });
 }
 /*
