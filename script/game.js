@@ -1,7 +1,7 @@
 //cd Documents/Alan/Personal/Avalon
 // for easy github
 
-//To-do list: Fix img transitions,Add round counter to game screen, Increment captain(account for OOB error),do pregame calculations(check win condition),merlin guess,implement 8+players
+//To-do list: Add round counter to game screen,merlin guess,implement 8+players
 
 //temp array to get set random indexes for each role
 var tempArray = null;
@@ -42,8 +42,11 @@ var voteTemp = "";
 var voteArray = null;
 var resistanceWins = 0;
 var spyWins = 0;
+//winner = false when spy wins, equals true win resistance wins
+var winner = false;
 
-var voteFlag = false;
+var globalVoteFlag = false;
+var gameOverFlag = false;
 
 /*
   Fischer-yates shuffle algorithm
@@ -197,6 +200,25 @@ function isTeamValid(arr) {
   console.log(teamTemp.toString());
   return checkArrayForDupes(teamTemp);
 }
+function checkSpy(member) {
+  for(var i = 0; i < spyArray.length; i++) {
+    if(playerArr[spyArray[i]] == member) {
+      return true;
+    }
+  }
+  return false;
+}
+//This fucntion checks to see if a winner has been found, and if so, sets the winner
+function checkWinner() {
+  if(resistanceWins == 3) {
+    winner = true;
+    return true;
+  } else if(spyWins == 3) {
+    return true;
+  }
+  return false;
+}
+
 var main = function() {
   //End of name entry, start pass and play game
   $(document).on('click', '#sgButton',function() {
@@ -267,16 +289,16 @@ var main = function() {
         }
         break;
       case 'Percival':
-        if(morgana != null) {
-          roleStatement = roleStatement.concat("You are the <span class='resistance'>Percival</span><br> The merlin is: "+  roleArray[merlin]);
+        if(morgana == null) {
+          roleStatement = roleStatement.concat("You are the <span class='resistance'>Percival</span><br> The merlin is: "+  playerArr[merlin]);
         }
         else {
           var seed = getRandomInt(0,1);
           if(seed === 0) {
-            roleStatement = roleStatement.concat("You are the <span class='resistance'>Percival</span><br> The merlin is either: "+  roleArray[merlin] + " or " + roleArray[morgana]);
+            roleStatement = roleStatement.concat("You are the <span class='resistance'>Percival</span><br> The merlin is either: "+  playerArr[morgana] + " or " + playerArr[merlin]);
           }
           else {
-            roleStatement = roleStatement.concat("You are the <span class='resistance'>Percival</span><br> The merlin is: "+  roleArray[morgana] + " or " + roleArray[merlin]);
+            roleStatement = roleStatement.concat("You are the <span class='resistance'>Percival</span><br> The merlin is: "+  playerArr[merlin] + " or " + playerArr[morgana]);
           }
 
         }
@@ -366,6 +388,15 @@ var main = function() {
   });
   //Game Main Menu
   $(document).on('click','#beginGame',function() {
+    //if it is after the 1st round, increment the captain
+    if(roundCounter != 1) {
+      captainIndex++;
+      if(captainIndex == numPlayers) {
+        captainIndex = 0;
+      }
+      captainName = playerArr[captainIndex];
+    }
+
     $('#statement').replaceWith("<div></div>");
     console.log("Round Counter: " + roundCounter);
     gameTemplate = "<div id='game' class='wrapper'>";
@@ -430,7 +461,7 @@ var main = function() {
     for(var formIndex = 0; formIndex < teamCount; formIndex++) {
       teamForm = teamForm.concat("<label for='team"+formIndex+"'>Team Member "+(formIndex+1)+":</label><select id = 'member"+formIndex+"' value='team"+formIndex+"'>");
       for(var i = 0;i<playerArr.length; i++) {
-        teamForm = teamForm.concat("<option value = "+ i +"> "+ playerArr[i] +"</option>");
+        teamForm = teamForm.concat("<option value = "+ i +">"+ playerArr[i] +"</option>");
       }
       teamForm = teamForm.concat("</select><br><br>");
     }
@@ -443,6 +474,7 @@ var main = function() {
     var div =$(gameTemplate);
 
     if(voteFlag) {
+      console.log("test");
       transition("#results",div,"#game");
     } else {
       transition("#all",div,"#game");
@@ -457,7 +489,7 @@ var main = function() {
       alert("Please pick a team with unique members!");
     } else {
       voteArray = [];
-      var voteSetup = "<div id='voteSetup' class='wrapper'>Pass to <strong>"+captainName+"</strong> to begin voting.<br><br><button id='vote' class='myButton'>Begin Voting</button></div>";
+      var voteSetup = "<div id='voteSetup' class='wrapper'>Pass to <strong>"+teamTemp[0]+"</strong> to begin voting.<br><br><button id='vote' class='myButton'>Begin Voting</button></div>";
       var div = $(voteSetup);
       transition("#game",div,"#voteSetup");
     }
@@ -466,70 +498,115 @@ var main = function() {
   });
   $(document).on('click','#vote', function() {
     if(voteCount == teamCount) {
-      voteTemp = $('#vote option:selected').text();
-      voteArray.push(voteTemp);
-      var voteReveal = "<div id='results' class='wrapper'>";
-      var passCount = 0;
-      var failCount = 0;
-      var color = "red";
-      //reset the vote count
-      voteCount = 0;
-      var result = "";
-      //tally the pass/fail
-      for(var i = 0; i < voteArray.length; i++) {
-        if(voteArray[i] === 'Pass') {
-          passCount++;
-        } else {
-          failCount++;
-        }
-      }
-      //Determine if mission fails or not
-      if(roundCounter === 4) {
-        if(failCount >= 2) {
-          result = 'Fail';
-        } else {
-          result = 'Pass';
-        }
-      } else {
-        if(failCount >= 1) {
-          result = 'Fail';
-        } else {
-          result = 'Pass';
-        }
-      }
-      if(result === 'Fail') {
-        spyWins++;
-        color = black;
-      } else {
-        resistanceWins++;
-      }
-      missionResultArray[roundCounter-2] = result;
-      voteReveal = voteReveal.concat("With "+passCount+" votes to pass the mission and "+failCount+" votes to fail the mission, the mission result is:<br><div style='color:"+color+"' class='wrapper'><strong>"+result+"</strong></div><br><button id='beginGame' class='myButton'>Continue</button></div>");
-      console.log("Current missions: " + missionResultArray.toString());
-
-      var div = $(voteReveal);
-      voteFlag = true;
-      transition("#voteForm",div,"#results");
-    } else {
-      if(voteCount != 0) {
-        voteTemp = $('#vote option:selected').text();
-        voteArray.push(voteTemp);
+      voteTemp = $('#voteSelect option:selected').text();
+      if(voteTemp[0] != '-') {
         console.log("Vote array is: " + voteArray.toString());
-      }
-      console.log("Vote Count is: " + voteCount);
-      var voting = "<div id='voteForm' class='wrapper'><label for ='vote'><strong>"+teamTemp[voteCount]+"</strong><br><br> Choose your vote for the mission.  :</label><select id='vote' value='vote'><option value='Pass'>Pass</option><option value = 'Fail'>Fail</option></select><br><br><button id ='vote' class='myButton'>Submit</button></div>";
+        voteArray.push(voteTemp);
+        var voteReveal = "<div id='results' class='wrapper'>";
+        var passCount = 0;
+        var failCount = 0;
+        var color = "red";
+        //reset the vote count
+        voteCount = 0;
+        var result = "";
+        //tally the pass/fail
+        for(var i = 0; i < voteArray.length; i++) {
+          if(voteArray[i] === 'Pass') {
+            passCount++;
+          } else {
+            failCount++;
+          }
+        }
+        //Determine if mission fails or not
+        if(roundCounter === 4) {
+          if(failCount >= 2) {
+            result = 'Fail';
+          } else {
+            result = 'Pass';
+          }
+        } else {
+          if(failCount >= 1) {
+            result = 'Fail';
+          } else {
+            result = 'Pass';
+          }
+        }
+        if(result === 'Fail') {
+          spyWins++;
+          color = "black";
+        } else {
+          resistanceWins++;
+        }
+        //set the result in the array, display results
+        missionResultArray[roundCounter-2] = result;
+        voteReveal = voteReveal.concat("With "+passCount+" votes to pass the mission and "+failCount+" votes to fail the mission, the mission result is:<br><div style='color:"+color+"' class='wrapper'><strong>"+result+"</strong></div><br>");
+        var cw = checkWinner();
+        if(cw) {
+          voteReveal = voteReveal.concat("<button id='endGame' class='myButton'>Continue</button>");
+        } else {
+          voteReveal = voteReveal.concat("<button id='beginGame' class='myButton'>Continue</button>");
+        }
+        voteReveal = voteReveal.concat("</div>");
+        console.log("Current missions: " + missionResultArray.toString());
 
-      var div = $(voting);
-      if(voteCount == 0) {
-        voteCount++;
-        transition("#voteSetup",div,"#voteForm");
+        var div = $(voteReveal);
+        //enable next round transition
+        globalVoteFlag = true;
+        transition("#voteForm",div,"#results");
       } else {
-        voteCount++;
-        transition("#voteForm",div,"#voteForm");
+        alert("Please choose a vote!!");
+      }
+    } else {
+      var voteFlag = false;
+      //If this is first vote, there is no previous vote to get, otherwise, log the previous vote
+      if(voteCount != 0) {
+        voteTemp = $('#voteSelect option:selected').text();
+        if(voteTemp[0] != '-') {
+          voteFlag = true;
+          voteArray.push(voteTemp);
+        }
+
+      } else {
+        //set valid since it is first vote
+        voteFlag = true;
+      }
+      //check to see if the vote is valid
+      if(voteFlag) {
+        var voting = "<div id='voteForm' class='wrapper'><label for ='vote'><strong>"+teamTemp[voteCount]+"</strong><br><br> Choose your vote for the mission.  :</label><select id='voteSelect' value='vote'><option value='x'>--Select Vote--</option><option value='Pass'>Pass</option>";
+
+        //if the voter is a spy, give them the option to fail
+        if(checkSpy(teamTemp[voteCount])) {
+          voting = voting.concat("<option value='Fail'>Fail</option>");
+        }
+        voting = voting.concat("</select><br><br><button id ='vote' class='myButton'>Submit</button></div>");
+
+        var div = $(voting);
+        if(voteCount == 0) {
+          voteCount++;
+          transition("#voteSetup",div,"#voteForm");
+        } else {
+          voteCount++;
+          transition("#voteForm",div,"#voteForm");
+        }
+      } else {
+        alert("Please choose a vote!");
       }
 
     }
   });
+
+  $(document).on('click','#endGame',function() {
+    //spies win
+    if(!winner) {
+
+
+    } else {
+      //resistance win, proceed to merlin guess
+
+    }
+
+  });
+
 
 
 
