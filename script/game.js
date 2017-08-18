@@ -218,7 +218,18 @@ function checkWinner() {
   }
   return false;
 }
-
+function createResistanceArray() {
+  var resistanceArray = [];
+  var count = 0;
+  for(var i = 0; i < numPlayers; i++) {
+    if(roleArray[i] != 'Mordred' && roleArray[i] != 'Spy0' && roleArray[i] != 'Spy1' && roleArray[i] != 'Morgana' && roleArray[i] != 'Oberon') {
+      resistanceArray[count] = playerArr[i];
+      count++;
+    }
+  }
+  console.log(resistanceArray.toString());
+  return resistanceArray;
+}
 var main = function() {
   //End of name entry, start pass and play game
   $(document).on('click', '#sgButton',function() {
@@ -473,7 +484,7 @@ var main = function() {
 
     var div =$(gameTemplate);
 
-    if(voteFlag) {
+    if(globalVoteFlag) {
       console.log("test");
       transition("#results",div,"#game");
     } else {
@@ -518,7 +529,8 @@ var main = function() {
           }
         }
         //Determine if mission fails or not
-        if(roundCounter === 4) {
+        console.log(roundCounter + " AFOAHGOIEA ROUNG COUNTERRRR");
+        if(roundCounter == 5) {
           if(failCount >= 2) {
             result = 'Fail';
           } else {
@@ -596,19 +608,47 @@ var main = function() {
   });
 
   $(document).on('click','#endGame',function() {
+    //transition from results
     //spies win
+    var ending;
     if(!winner) {
+      ending = "<div id='ending' class='wrapper'>The <strong>Spies</strong> win!<br><br> Refresh webpage to play again!</div>";
 
 
     } else {
       //resistance win, proceed to merlin guess
-
+      ending = "<div id='ending' class='wrapper'>The <div style='color:Red' class='wrapper'><strong>Resistance</strong></div> win!<br><br>Proceed to Merlin guess.<br><br><button class='myButton' id='merlinGuess'>Continue</button></div>";
     }
+    var div = $(ending);
+    transition("#results",div,"#ending");
 
   });
+  $(document).on('click','#merlinGuess', function() {
+    var guess = "<div id='guess' class='wrapper'>Pass to <strong>" + playerArr[mordred] + "</strong>.<br> Who is the merlin?<br><br><label for = 'guessing'>Select your choice for Merlin:</label><select id = 'mg' value='guessing'>";
+    var arr = createResistanceArray();
+    for(var i = 0; i < arr.length; i++) {
+      guess = guess.concat("<option value = "+i+">" + arr[i] +"</option>");
+    }
+    guess = guess.concat("</select><br><br><button id='answer' class='myButton'>Submit</button></div>");
+    var div = $(guess);
+    transition("#ending",div,"#guess");
 
+  })
+  $(document).on('click','#answer', function() {
+    var ans = $("#mg option:selected").text();
+    var out = "<div id='final' class='wrapper'>" + ans;
+    if(ans == playerArr[merlin]) {
+      out = out.concat("IS the Merlin! Spies win!");
+    } else {
+      out = out.concat("IS NOT the Merlin!<br>The Merlin was "+ playerArr[merlin]+ "! <br>Resistance win!");
+    }
+    out = out.concat("</div>");
+    var div = $(out);
+    transition("#guess",div,"#final");
+    $("#helpDiv").replaceWith("<div id='helpDiv' class='wrapper'><p id= 'helpText'>The game is over. Please refresh the page to play again.</p></div>");
+  });
 
-
+//$("#helpDiv").replaceWith("<div id='helpDiv' class='wrapper'><p id= 'helpText'></p></div>");
 
 
 }
