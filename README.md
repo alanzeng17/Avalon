@@ -18,11 +18,15 @@ Please refer here to see how to play Avalon and use the website
 # RELEASES
 
 v0.1 6/20/17
+
 Initial front end GUI and fucntionality completed for start page
 
 V0.5 7/29/17
+
 Late update, but nearly completed a beta version of Avalon. So far everything until the creation of the team for the first round is done(play by play). That includes menu screens, player selection, role selection, "night mode". The graphics to display the current state are only complete for the beginning of round 1(also only for 7 players, as 8+ players will have different team requirements). 
+
 V0.9 8/18/17
+
 The game is(almost) DONE! Fully works, but requires play testing and some extra features that I personally would like to add. 8+ player pictures need to be created, but 7 players should work just fine. The only thing remaining is to put it onto a domain and add remaining features.
 
 #
