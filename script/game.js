@@ -47,6 +47,7 @@ var winner = false;
 
 var globalVoteFlag = false;
 var gameOverFlag = false;
+var restarted = false;
 
 /*
   Fischer-yates shuffle algorithm
@@ -160,11 +161,9 @@ function setIndexes() {
     spyArray.push(roleArray.indexOf('Spy'+i));
   }
   if(morgana != null) {
-    console.log("test");
     spyArray.push(morgana);
   }
   if(oberon != null) {
-    console.log("useless");
     spyArray.push(oberon);
   }
   merlin = roleArray.indexOf('Merlin');
@@ -197,7 +196,6 @@ function isTeamValid(arr) {
     var mem = $('#member'+i+' option:selected').text();
     teamTemp.push(mem);
   }
-  console.log(teamTemp.toString());
   return checkArrayForDupes(teamTemp);
 }
 function checkSpy(member) {
@@ -227,7 +225,6 @@ function createResistanceArray() {
       count++;
     }
   }
-  console.log(resistanceArray.toString());
   return resistanceArray;
 }
 var main = function() {
@@ -249,8 +246,8 @@ var main = function() {
       createRoleArray();
       setIndexes();
 
-      console.log(roleArray.toString());
-      console.log(playerArr.toString());
+    //  console.log(roleArray.toString());
+    //  console.log(playerArr.toString());
 
       var blank = "<div id = 'blank' class = 'wrapper'><label for='captain'>Select the first Captain: </label><select id = 'cap' value = 'captain'>";
       for(var i = 0; i < playerArr.length; i++) {
@@ -362,9 +359,10 @@ var main = function() {
       $(this).replaceWith(div);
       $("#all").fadeIn(550);
     });*/
-      captainName = $("#cap option:selected").text();
-      captainIndex = $("#cap").val();
-      console.log("Captain: "+ captainName + ": " + captainIndex);
+      if(!restarted) {
+        captainName = $("#cap option:selected").text();
+        captainIndex = $("#cap").val();
+      }
       transition("#blank",div,"#all");
     } else {
       /*$("#all").fadeOut("slow", function () {
@@ -380,6 +378,7 @@ var main = function() {
   $(document).on('click','#restartNight',function() {
     //completly restart night mode
     papCounter = 0;
+    restarted = true;
     $('#statement').replaceWith("<div></div>");
     var div = $("<div id='blank' class='wrapper'><button id='spapButton' class='myButton'>Restart Night</button><button id='cancelR' class='myButton'>Cancel</button></div>");
     transition("#all",div,"#blank");
@@ -409,7 +408,6 @@ var main = function() {
     }
 
     $('#statement').replaceWith("<div></div>");
-    console.log("Round Counter: " + roundCounter);
     gameTemplate = "<div id='game' class='wrapper'>";
     switch(roundCounter) {
       case 1:
@@ -462,11 +460,12 @@ var main = function() {
         }
 
       }
+      teamCount++;
     }
     imgTemplate = imgTemplate.concat("</div>");
 
     gameTemplate = gameTemplate.concat(imgTemplate);
-    gameTemplate = gameTemplate.concat("<div id='dispCap' class='wrapper'>The Captain is: <strong>"+captainName+"</strong></div>");
+    gameTemplate = gameTemplate.concat("<div id='score' class='wrapper'><p style='color:red'><strong>Resistance Wins: " + resistanceWins+"</strong></p><p>Spy Wins: <strong>" + spyWins+"</strong></p><br>The Captain is: <strong>"+captainName+"</strong></div>");
     //Creates the forms to set up the team
     var teamForm = "<div id ='teamForm' class='wrapper'>";
     for(var formIndex = 0; formIndex < teamCount; formIndex++) {
@@ -485,7 +484,6 @@ var main = function() {
     var div =$(gameTemplate);
 
     if(globalVoteFlag) {
-      console.log("test");
       transition("#results",div,"#game");
     } else {
       transition("#all",div,"#game");
@@ -511,7 +509,6 @@ var main = function() {
     if(voteCount == teamCount) {
       voteTemp = $('#voteSelect option:selected').text();
       if(voteTemp[0] != '-') {
-        console.log("Vote array is: " + voteArray.toString());
         voteArray.push(voteTemp);
         var voteReveal = "<div id='results' class='wrapper'>";
         var passCount = 0;
@@ -529,7 +526,6 @@ var main = function() {
           }
         }
         //Determine if mission fails or not
-        console.log(roundCounter + " AFOAHGOIEA ROUNG COUNTERRRR");
         if(roundCounter == 5) {
           if(failCount >= 2) {
             result = 'Fail';
